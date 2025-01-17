@@ -6,43 +6,42 @@
 <div id="embedded-app-container"></div>
 
 <!-- Add your embedded app script -->
-<script src="/dist/embedded-app.umd.js"></script>
+<script src="embedded-app.umd.js"></script>
 
 <script>
+  // Function to fetch access token
+  const getToken = async () => {
+    const apiUrl = 'http://localhost:8080/embed-token';
+    const data = {
+      dashboard_id: 'd495a09c-bf2f-4c33-9236-7df2aadd9765',
+      datasource_id: '563a3463-6f1c-4a1c-84cf-9f48477c0e5a',
+      variables: {},
+    };
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    };
+
+    console.info('Fetching token from server...');
+    const response = await fetch(apiUrl, requestOptions);
+
+    if (!response.ok) {
+      console.error('Error:', error);
+      throw new Error('Error occurred while fetching access token.');
+    }
+
+    console.info('Token fetched successfully!');
+    return response.json();
+  };
+
   // Initialize the embedded app
   EmbeddedApp.initialize({
     containerId: 'embedded-app-container',
     org: 'last9',
-    baseUrl: 'https://alpha.last9.io',
-    getToken: async () => {
-      const apiUrl = 'http://localhost:8080/embed-token';
-      const data = {
-        datasource_id: '0284dd90-7b00-49b0-8cd0-b3779cbe416d',
-        dashboard_id: 'caefc113-b913-4f3a-a759-aae6f72ccaef',
-        variables: {
-          service: ['preprod-tr-rtt-service-tomcat-svc'],
-          latency: [0.5],
-        },
-      };
-
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      };
-
-      console.info('Fetching token from server...');
-      const response = await fetch(apiUrl, requestOptions);
-
-      if (!response.ok) {
-        console.error('Error:', error);
-        throw new Error('Error occurred while fetching access token.');
-      }
-
-      console.info('Token fetched successfully!');
-      return response.json();
-    },
+    getToken,
   });
 </script>
