@@ -1,47 +1,71 @@
-<!-- Add required dependencies -->
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Embedded Dashboard</title>
 
-<!-- Container for your app -->
-<div id="embedded-app-container"></div>
+    <!-- Add required dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-<!-- Add your embedded app script -->
-<script src="embedded-app.umd.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
 
-<script>
-  // Function to fetch access token
-  const getToken = async () => {
-    const apiUrl = 'http://localhost:8080/embed-token';
-    const data = {
-      dashboard_id: 'd495a09c-bf2f-4c33-9236-7df2aadd9765',
-      datasource_id: '563a3463-6f1c-4a1c-84cf-9f48477c0e5a',
-      variables: {},
-    };
+    <link
+      fetchpriority="high"
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+    />
 
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    };
+    <link
+      rel="stylesheet"
+      href="https://cdn.last9.io/dashboard-assets/embedded/style.css"
+    />
+  </head>
+  <body>
+    <!-- Container for your app -->
+    <div id="embedded-app-container"></div>
 
-    console.info('Fetching token from server...');
-    const response = await fetch(apiUrl, requestOptions);
+    <!-- Embedded dashboard script -->
+    <script src="https://cdn.last9.io/dashboard-assets/embedded/last9-embedded-dashboard.umd.js"></script>
 
-    if (!response.ok) {
-      console.error('Error:', error);
-      throw new Error('Error occurred while fetching access token.');
-    }
+    <script>
+      // Function to fetch access token
+      const getToken = async () => {
+        const apiUrl = 'http://localhost:8080/embed-token';
+        const data = {
+          datasource_id: '',
+          dashboard_id: '',
+          variables: {},
+        };
 
-    console.info('Token fetched successfully!');
-    return response.json();
-  };
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        };
 
-  // Initialize the embedded app
-  EmbeddedApp.initialize({
-    containerId: 'embedded-app-container',
-    org: 'last9',
-    getToken,
-  });
-</script>
+        console.info('Fetching token from server...');
+        const response = await fetch(apiUrl, requestOptions);
+
+        if (!response.ok) {
+          console.error('Error:', error);
+          throw new Error('Error occurred while fetching access token.');
+        }
+
+        console.info('Token fetched successfully!');
+        return response.json();
+      };
+
+      // Initialize the embedded dashboard app
+      EmbeddedDashboardApp.initialize({
+        containerId: 'embedded-app-container',
+        org: 'last9',
+        getToken,
+      });
+    </script>
+  </body>
+</html>
