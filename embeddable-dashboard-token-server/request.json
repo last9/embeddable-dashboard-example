@@ -1,0 +1,12 @@
+{
+    "dashboard_id": "caefc113-b913-4f3a-a759-aae6f72ccaef",
+    "datasource_id": "0284dd90-7b00-49b0-8cd0-b3779cbe416d",
+    "variables": {
+        "service": [
+            "preprod-tr-rtt-service-tomcat-svc"
+        ],
+        "latency": [
+            0.5
+        ]
+    }
+}
