@@ -1,10 +1,5 @@
 # embeddable-dashboard-client
 
-## Sequence Diagram
-
-This diagram explains the entire flow of Embedded Dashboard
-![Sequence Diagram](sequence-diagram.png)
-
 ## Steps to integrate Last9 Embedded Dashboard in your web application
 
 ### 1. Goto client application directory
