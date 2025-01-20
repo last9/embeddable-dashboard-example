@@ -6,9 +6,6 @@
     <title>Embedded Dashboard</title>
 
     <!-- Add required dependencies -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
 
@@ -20,12 +17,26 @@
 
     <link
       rel="stylesheet"
+      href="https://cdn.last9.io/dashboard-assets/embedded/public/css/inter.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.last9.io/dashboard-assets/embedded/public/css/commit.css"
+    />
+
+    <link
+      rel="stylesheet"
       href="https://cdn.last9.io/dashboard-assets/embedded/style.css"
     />
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   </head>
+
   <body>
     <!-- Container for your app -->
-    <div id="embedded-app-container"></div>
+    <div id="embedded-app-container" style="height: 100vh"></div>
 
     <!-- Embedded dashboard script -->
     <script src="https://cdn.last9.io/dashboard-assets/embedded/last9-embedded-dashboard.umd.js"></script>
@@ -60,11 +71,17 @@
         return response.json();
       };
 
+      // Callback function to handle error
+      const onError = (error) => {
+        console.error(error);
+      };
+
       // Initialize the embedded dashboard app
       EmbeddedDashboardApp.initialize({
         containerId: 'embedded-app-container',
         org: 'last9',
         getToken,
+        onError,
       });
     </script>
   </body>
