@@ -63,7 +63,7 @@
         const response = await fetch(apiUrl, requestOptions);
 
         if (!response.ok) {
-          console.error('Error:', error);
+          console.error('Error:', response.error);
           throw new Error('Error occurred while fetching access token.');
         }
 
