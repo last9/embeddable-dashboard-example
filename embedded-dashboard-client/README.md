@@ -1,10 +1,10 @@
-# embeddable-dashboard-client
+# embedded-dashboard-client
 
 ## Steps to integrate Last9 Embedded Dashboard in your web application
 
 ### 1. Goto client application directory
 
-`cd embeddable-dashboard-client`
+`cd embedded-dashboard-client`
 
 ### 2. In index.html, update the request data to generate token with appropriate values
 
