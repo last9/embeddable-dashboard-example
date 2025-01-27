@@ -73,7 +73,7 @@ const EmbeddedDashboardApp = () => {
 
     // Load the dashboard script dynamically
     loadScript(
-      'https://cdn.last9.io/dashboard-assets/embedded/last9-embedded-dashboard.umd.js'
+      'https://cdn.last9.io/dashboard-assets/embedded/last9-embedded-dashboard.umd-v1.1.js'
     )
       .then(() => {
         console.log('Dashboard script loaded.');
