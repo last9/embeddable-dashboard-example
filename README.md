@@ -1,181 +1,127 @@
-# embeddable-dashboard-example
+# How to Embed a Last9 Dashboard in Your Own App
 
-## Overview
-
-This repository demonstrates how to securely embed a Last9 dashboard in your web
-application. It includes:
-
-- **embedded-dashboard-client**: Sample HTML/JS client for embedding the
-  dashboard.
-- **embedded-dashboard-client-react**: React app example for embedding the
-  dashboard.
-- **embedded-dashboard-token-server**: Go server to securely generate embed
-  tokens for the dashboard.
+This section provides a step-by-step guide to embedding a Last9 dashboard into
+your own application, based on the provided sequence diagram and sample code.
+You do **not** need to run or edit any files in this repository—just follow
+these instructions and copy the relevant code snippets into your own frontend
+and backend.
 
 ---
 
-## 1. Prerequisites
+## 1. Backend: Secure Token Endpoint
 
-- Access to your Last9 dashboard and data source UUIDs.
-- **API Refresh Token**: Obtain your API refresh token from the
-  [API Access page](https://app.last9.io/settings/api-access) on Last9. Use the
-  **read refresh token** for embedding dashboards.  
-  _Reference:
-  [https://app.last9.io/settings/api-access](https://app.last9.io/settings/api-access)_
-- **Dashboard ID**: You can find your dashboard ID in the dashboard URL. It is
-  the part after `/dashboards/` and before the `?` (query parameters). For
-  example, in the URL:
+You need a backend endpoint that your frontend can call to fetch a short-lived
+dashboard access token. This keeps your Last9 API credentials secure.
 
-  `https://app.last9.io/v2/organizations/{org}/dashboards/{dashboard_id}?cluster=...`
+**Example (Go, based on
+[`embedded-dashboard-token-server/main.go`](embedded-dashboard-token-server/main.go)):**
 
-  The dashboard ID is `{dashboard_id}`.
+```go
+// Pseudocode for a secure token endpoint
+http.HandleFunc("/embed-token", func(w http.ResponseWriter, r *http.Request) {
+    // Parse dashboard_id, datasource_id, variables from request body
+    // Use your org and Last9 API read refresh token (see README prerequisites)
+    // Make a POST request to:
+    //   https://app.last9.io/api/v4/oauth/organizations/{org}/dashboard/embed_token
+    //   with Authorization: Bearer <refresh_token>
+    //   and the dashboard_id, datasource_id, variables in the body
+    // Return the response JSON to the frontend
+})
+```
 
-  \_Reference:
-  [Dashboard URL Example](https://app.last9.io/v2/organizations/{org}/dashboards/{dashboard_id}?cluster=...)
-
-- Node.js (for running the client or React app).
-- Go (for running the token server).
+- See
+  [`embedded-dashboard-token-server/main.go`](embedded-dashboard-token-server/main.go)
+  for a full implementation.
+- Your endpoint should **never expose your refresh token to the browser**.
 
 ---
 
-## 2. Setting Up the Token Server
+## 2. Frontend: Load the Dashboard and Fetch Token
 
-The token server securely generates short-lived tokens for embedding the
-dashboard.
+### a. Load the Dashboard Library
 
-### a. Configure the server
+Add the following `<script>` tag to your HTML (or load dynamically in React):
 
-Edit `embedded-dashboard-token-server/config.json`:
+```html
+<script src="https://cdn.last9.io/dashboard-assets/embedded/last9-embedded-dashboard.umd-v1.1.js"></script>
+```
 
-```json
-{
-  "org": "your-org-name",
-  "refresh_token": "your-last9-read-refresh-token"
+### b. Add a Container for the Dashboard
+
+```html
+<div id="embedded-dashboard-container" style="height: 100vh; width: 100%"></div>
+```
+
+### c. Fetch the Token from Your Backend
+
+```js
+async function getToken() {
+  const response = await fetch("/embed-token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      dashboard_id: "<your-dashboard-id>",
+      datasource_id: "<your-datasource-id>",
+      variables: {
+        /* your variables here */
+      },
+    }),
+  });
+  if (!response.ok) throw new Error("Failed to fetch token");
+  return response.json();
 }
 ```
 
-- The `refresh_token` should be the **read refresh token** from your
-  [API Access page](https://app.last9.io/settings/api-access).
+- See
+  [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
+  for a working example.
 
-### b. Build and run the server
+### d. Initialize the Dashboard
 
-```sh
-cd embedded-dashboard-token-server
-go build
-./embedded-dashboard-token-server
+```js
+EmbeddedDashboardApp.initialize({
+  containerId: "embedded-dashboard-container",
+  org: "<your-org>",
+  getToken, // the function above
+  onError: (err) => {
+    console.error("Dashboard error", err);
+  },
+});
 ```
 
-The server will listen on `http://localhost:8080`.
-
-### c. Test the server
-
-Edit `request.json` with your dashboard and datasource IDs:
-
-```json
-{
-  "dashboard_id": "your-dashboard-uuid",
-  "datasource_id": "your-datasource-uuid",
-  "variables": {
-    "service": ["your-service"],
-    "latency": [0.5]
-  }
-}
-```
-
-- The `dashboard_id` can be copied from your dashboard URL as described above.
-
-Test with:
-
-```sh
-curl -X POST http://localhost:8080/embed-token \
-  -H "Content-Type: application/json" \
-  -d @request.json
-```
-
-You should receive a JSON response with an access token.
+- See
+  [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
+  and
+  [`embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx`](embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx)
+  for more details.
 
 ---
 
-## 3. Embedding in a Plain HTML/JS App
+## 3. Token Refresh Flow
 
-### a. Configure the client
-
-Edit `embedded-dashboard-client/index.html`:
-
-- Set your `dashboard_id`, `datasource_id`, and `variables` in the `getToken`
-  function's `data` object.
-- Set your org name in the `initialize` call.
-
-### b. Serve the client
-
-```sh
-cd embedded-dashboard-client
-npm install -g http-server
-http-server . -a localhost -p 8081 --cors
-```
-
-Visit [http://localhost:8081](http://localhost:8081) in your browser.
+- The dashboard library will automatically call your `getToken` function to
+  refresh the token every 30 minutes (see the
+  [sequence diagram](sequence-diagram.png)).
+- Your backend endpoint should always return a fresh, valid token.
+- The dashboard will also periodically fetch new data using the current token.
 
 ---
 
-## 4. Embedding in a React App
+## 4. Summary of Steps
 
-### a. Configure the React client
-
-Edit `embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx`:
-
-- Set your `dashboard_id`, `datasource_id`, and `variables` in the
-  `accessTokenReqData` object.
-- Set your org name in the `initialize` call.
-
-### b. Run the React app
-
-```sh
-cd embedded-dashboard-client-react
-yarn install
-yarn start
-```
-
-Visit [http://localhost:3000](http://localhost:3000).
+1. **Implement a secure `/embed-token` endpoint** in your backend (see above).
+2. **Add the dashboard library** to your frontend.
+3. **Add a container div** for the dashboard.
+4. **Write a `getToken` function** that calls your backend endpoint.
+5. **Initialize the dashboard** with your org, container, and `getToken`
+   function.
+6. **Handle errors** via the `onError` callback.
 
 ---
 
-## 5. Production Deployment
+For more details and full code samples, see:
 
-- **Token Server**: Deploy the Go token server to a secure backend (do not
-  expose your refresh token to the client).
-- **Client**: Deploy your HTML/JS or React app as you would any web application.
-- **CORS**: Ensure your token server allows requests from your production
-  domain.
-
----
-
-## 6. Sequence Diagram
-
-See `sequence-diagram.png` in the root for a visual overview of the embedding
-flow.
-
----
-
-## 7. Example Files
-
-- `embedded-dashboard-token-server/request.json`: Example request for token
-  generation.
-- `embedded-dashboard-client/index.html`: Example HTML/JS integration.
-- `embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx`: Example React
-  integration.
-
----
-
-## 8. Quick Reference: Steps
-
-1. **Configure and run the token server** with your org and refresh token.
-2. **Edit the client** (HTML or React) to use your dashboard/datasource IDs and
-   org.
-3. **Serve the client** (locally or in production).
-4. **Ensure the client fetches tokens from your backend** (never expose your
-   refresh token to the browser).
-
----
-
-For more details, see the README files in each subdirectory.
+- [`embedded-dashboard-token-server/main.go`](embedded-dashboard-token-server/main.go)
+- [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
+- [`embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx`](embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx)
+- [sequence-diagram.png](sequence-diagram.png)
