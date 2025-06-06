@@ -17,8 +17,22 @@ application. It includes:
 ## 1. Prerequisites
 
 - Access to your Last9 dashboard and data source UUIDs.
-- A Last9 API refresh token (obtainable from
-  [app.last9.io](https://app.last9.io)).
+- **API Refresh Token**: Obtain your API refresh token from the
+  [API Access page](https://app.last9.io/settings/api-access) on Last9. Use the
+  **read refresh token** for embedding dashboards.  
+  _Reference:
+  [https://app.last9.io/settings/api-access](https://app.last9.io/settings/api-access)_
+- **Dashboard ID**: You can find your dashboard ID in the dashboard URL. It is
+  the part after `/dashboards/` and before the `?` (query parameters). For
+  example, in the URL:
+
+  `https://app.last9.io/v2/organizations/{org}/dashboards/{dashboard_id}?cluster=...`
+
+  The dashboard ID is `{dashboard_id}`.
+
+  \_Reference:
+  [Dashboard URL Example](https://app.last9.io/v2/organizations/{org}/dashboards/{dashboard_id}?cluster=...)
+
 - Node.js (for running the client or React app).
 - Go (for running the token server).
 
@@ -36,9 +50,12 @@ Edit `embedded-dashboard-token-server/config.json`:
 ```json
 {
   "org": "your-org-name",
-  "refresh_token": "your-last9-refresh-token"
+  "refresh_token": "your-last9-read-refresh-token"
 }
 ```
+
+- The `refresh_token` should be the **read refresh token** from your
+  [API Access page](https://app.last9.io/settings/api-access).
 
 ### b. Build and run the server
 
@@ -64,6 +81,8 @@ Edit `request.json` with your dashboard and datasource IDs:
   }
 }
 ```
+
+- The `dashboard_id` can be copied from your dashboard URL as described above.
 
 Test with:
 
