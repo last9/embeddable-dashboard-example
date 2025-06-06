@@ -76,7 +76,20 @@ async function getToken() {
   [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
   for a working example.
 
-#### Example: Variables Object
+#### Your dashboard ID
+
+You can find your dashboard ID in the Last9 dashboard URL. It is the part after
+`/dashboards/` and before the `?` (query parameters).
+
+For example, in the URL:
+
+```
+https://app.last9.io/v2/organizations/{org}/dashboards/{dashboard_id}?cluster=...
+```
+
+The dashboard ID is `{dashboard_id}`.
+
+#### Variables
 
 The `variables` object should match the variable configuration of your
 dashboard. For example:
