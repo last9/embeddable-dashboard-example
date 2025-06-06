@@ -142,4 +142,12 @@ For more details and full code samples, see:
 - [`embedded-dashboard-token-server/main.go`](embedded-dashboard-token-server/main.go)
 - [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
 - [`embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx`](embedded-dashboard-client-react/src/EmbeddedDashboardApp.tsx)
-- [sequence-diagram.png](sequence-diagram.png)
+
+![Sequence Diagram](sequence-diagram.png)
+
+---
+
+## Troubleshooting
+
+Please get in touch with us on [Discord](https://discord.com/invite/Q3p2EEucx9)
+or [Email](mailto:cs@last9.io) if you have any questions.
