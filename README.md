@@ -76,6 +76,24 @@ async function getToken() {
   [`embedded-dashboard-client/index.html`](embedded-dashboard-client/index.html)
   for a working example.
 
+#### Example: Variables Object
+
+The `variables` object should match the variable configuration of your
+dashboard. For example:
+
+```js
+variables: {
+  service: ["prod-checkout"],
+  latency: [0.5]
+}
+```
+
+- The keys (e.g., `service`, `latency`) and their value types (arrays) should
+  match what your dashboard expects.
+- See
+  [`embedded-dashboard-token-server/request.json`](embedded-dashboard-token-server/request.json)
+  for a full example.
+
 ### d. Initialize the Dashboard
 
 ```js
